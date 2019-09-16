@@ -6,7 +6,7 @@ export enum PostStatus{
 }
 
 @Entity()
-export class Post{
+export class Article{
 
     @PrimaryGeneratedColumn()
     id:number;
