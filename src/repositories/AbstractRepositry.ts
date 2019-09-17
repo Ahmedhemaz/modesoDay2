@@ -1,20 +1,21 @@
-import { ClassType } from "class-transformer/ClassTransformer";
-import {getRepository, createConnection, Connection} from "typeorm";
-import {Repository} from "../repositories/interfaces/Repository";
-import { Article } from "../entity/Article";
+import { getRepository} from "typeorm";
+import { Service } from "typedi";
 
-export abstract class AbstractRepository<T> implements Repository<T>{
 
-    private entityClass:ClassDecorator;
+@Service()
+export abstract class AbstractRepository<T>{
+
+    private entityClass;
     constructor(entityClass){
         this.entityClass = entityClass;
+
     }
 
     getAll(){
-        createConnection().then(async connection =>{
-            const entityRepository =  connection.getRepository(this.entityClass);
-            return  entityRepository.find() ;
-        }) .catch(error => console.log(error));
+        const entityRepository = getRepository(this.entityClass);
+        return entityRepository.find().then(entityList => {
+            return entityList;
+        }).catch(error => error);
     }
 
     getOneById(id:number):T{
@@ -22,14 +23,8 @@ export abstract class AbstractRepository<T> implements Repository<T>{
     }
 
     create(entity:T):void{
-        createConnection().then(async connection => {
-            
-            const entityRepository = connection.getRepository(Article);
-            await entityRepository.save(entity);
-            console.log(entity)
-
-        }).catch(error => console.log(error));
-
+        const entityRepository = getRepository(this.entityClass);
+        entityRepository.save(entity).catch(error => error);
     }
 
     update(entity:T):void{

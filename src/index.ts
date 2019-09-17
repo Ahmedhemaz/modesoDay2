@@ -1,15 +1,16 @@
 import "reflect-metadata";
-// import {createConnection} from "typeorm";
-// import * as express from "express";
-// import * as bodyParser from "body-parser";
-// import {Request, Response} from "express";
-// import {Routes} from "./routes";
-// import {User} from "./entity/User";
 import {createExpressServer } from "routing-controllers";
 import { UserController } from "./controller/UserController";
 import { ArticleController } from "./controller/ArticleController";
+import { DbConnector } from "./generic-connections/DbConnector";
+import {Container} from "typedi";
+import { useContainer } from "typeorm";
+
+
 
 const port: number = 8080;
+const dbConnection = DbConnector.getInestance();
+useContainer(Container);
 const app = createExpressServer({
     controllers: [UserController,ArticleController]
 })
