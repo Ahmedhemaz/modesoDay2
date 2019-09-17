@@ -1,7 +1,7 @@
 import {Controller, Param, Body, Get, Post, Put, Delete, JsonController, Res} from "routing-controllers";
 import { Article } from "../entity/Article";
 import {ArticleRepository} from "../repositories/ArticleRepository";
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 import Container, { Inject, Service } from "typedi";
 
 @Service()
@@ -15,7 +15,6 @@ export class ArticleController{
     
     @Get("/articles")
     getAll(@Res() response:Response){
-        console.log("this.articleRepo: "+this.articleRepository)
         return this.articleRepository.getAll().then(articles => {
             if(articles === null){
                 return response.status(204).send({message:"No Content"})
@@ -26,9 +25,38 @@ export class ArticleController{
             });
     }
 
+    @Get("/articles/:id")
+    getOne(@Param("id") id:number, @Res() response:Response){
+        return this.articleRepository.getOneById(id)
+        .then(article => {
+            if(!article){
+                return response.status(404).send({message:"Not Found"})
+            }
+            return response.status(200).send({data:article});
+        })
+        .catch(()=>{
+            return response.status(400).send({message: "Bad Request"});
+        })
+    }
+
+
     @Post("/articles")
     create(@Body() article:Article){
-        this.articleRepository.create(article);
-        return "Done"
+        return  this.articleRepository.create(article);
     }
+
+    @Put("/articles/:id")
+    update(@Param("id") id:number, @Res() response:Response, @Body() article:Article){
+        return this.articleRepository.update(id, article)
+        .then(article => {
+            if(!article){
+                return response.status(404).send({message:"Not Found"});
+            }
+            return response.status(200).send({data:article});
+        })
+        .catch(error=>{
+            return response.status(400).send({message:error.message});
+        })
+    }
+
 }

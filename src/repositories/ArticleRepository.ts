@@ -7,7 +7,6 @@ import { Service } from "typedi";
 export class ArticleRepository extends AbstractRepository<Article>{
     
     constructor(){
-        console.log("ARticle repo constructor");
         super(Article.name);
     }
 
