@@ -1,4 +1,6 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, BeforeInsert} from "typeorm";
+import { Article } from "./Article";
+import * as bcrypt from "bcrypt";
 
 @Entity()
 export class User {
@@ -26,5 +28,13 @@ export class User {
 
     @UpdateDateColumn({type: "timestamp"})
     updatedAt: Date;
+
+    @OneToMany(type => Article, article => article.user)
+    articles: Article[]
+
+    @BeforeInsert()
+    async hashUserPassword(){
+        this.password =  await bcrypt.hash(this.password, 10);
+    }
 
 }

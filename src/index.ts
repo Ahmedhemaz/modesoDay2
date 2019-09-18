@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {createExpressServer } from "routing-controllers";
-import { UserController } from "./controller/UserController";
 import { ArticleController } from "./controller/ArticleController";
+import { UserController } from "./controller/UserController";
 import { DbConnector } from "./generic-connections/DbConnector";
 import {Container} from "typedi";
 import { useContainer } from "typeorm";

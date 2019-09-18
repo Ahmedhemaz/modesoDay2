@@ -1,8 +1,8 @@
-import {Controller, Param, Body, Get, Post, Put, Delete, JsonController, Res} from "routing-controllers";
+import {Controller, Param, Body, Get, Post, Put, Delete, JsonController, Res, OnUndefined, HttpCode} from "routing-controllers";
 import { Article } from "../entity/Article";
 import {ArticleRepository} from "../repositories/ArticleRepository";
-import { Request, Response, response } from "express";
-import Container, { Inject, Service } from "typedi";
+import { Response } from "express";
+import Container, { Service } from "typedi";
 
 @Service()
 @JsonController()
@@ -40,23 +40,26 @@ export class ArticleController{
     }
 
 
+    @HttpCode(201)
     @Post("/articles")
     create(@Body() article:Article){
         return  this.articleRepository.create(article);
     }
 
+
     @Put("/articles/:id")
     update(@Param("id") id:number, @Res() response:Response, @Body() article:Article){
-        return this.articleRepository.update(id, article)
-        .then(article => {
-            if(!article){
-                return response.status(404).send({message:"Not Found"});
-            }
-            return response.status(200).send({data:article});
-        })
-        .catch(error=>{
-            return response.status(400).send({message:error.message});
-        })
+       return this.articleRepository.update(id,this.serializeRequest(article))
+            .then(article => {
+                return response.status(201).send({data:article});
+            })
+            .catch(error => {
+                return response.status(400).send({message:error.message}); 
+            });
+    }
+
+    private serializeRequest({title,description,status}):any {
+        return {title,description,status};
     }
 
 }

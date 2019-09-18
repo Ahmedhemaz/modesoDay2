@@ -31,22 +31,23 @@ export abstract class AbstractRepository<T>{
     }
 
     update(id:number,updatedEntity:T):any{
-        return this.entityRepository.findOne(id)
-        .then(oldEntity => {
-            if(oldEntity === undefined) {
-                throw new Error("Not Found")
-            }
-            Object.keys(updatedEntity).forEach(
-                (key)=>{
-                    if(oldEntity[key] !== undefined){
-                        oldEntity[key] = updatedEntity[key];
-                    }else{
-                        throw new Error("Bad Request");
-                    }
+       return this.getOneById(id).then(oldEntity =>{
+                if(!oldEntity){
+                    throw new Error("Not Found")
                 }
-            )
-           return this.entityRepository.save(oldEntity);
-        })
+                return oldEntity
+            }).then(oldEntity => {
+                    Object.keys(updatedEntity).forEach(
+                        (key)=>{
+                            if(oldEntity[key] !== undefined){
+                                oldEntity[key] = updatedEntity[key] || oldEntity[key];
+                            }else{
+                                throw new Error("Bad Request")
+                            }
+                        }
+                    )
+                return this.entityRepository.save(oldEntity);
+                })
     }
 
     delete(entity:T):void{
